@@ -1,0 +1,12 @@
+.cell {
+        padding: 0.5rem;
+}
+
+.result-winner {
+        min-width: 10rem;
+        font-weight: bold;
+}
+
+.result-loser {
+        min-width: 10rem;
+}
