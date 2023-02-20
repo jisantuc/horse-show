@@ -20,7 +20,9 @@ object render:
     }
   def resultRowToHtml(row: ResultLine): Html[Msg] =
     div(styles("display" -> "flex", "flex-direction" -> "row"))(
-      div(styles(flex), `class` := "round-number cell")(text(row.round.toString())),
+      div(styles(flex), `class` := "round-number cell")(
+        text(row.round.toString())
+      ),
       div(styles(flex), `class` := "result-game cell")(text(iconFor(row.game))),
       div(styles(flex), `class` := "result-winner cell")(text(row.winner.name)),
       div(styles(flex), `class` := "result-loser cell")(text(row.loser.name))
