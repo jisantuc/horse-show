@@ -7,6 +7,11 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 
 ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.5.0"
 
+val Versions = new {
+  val circeVersion = "0.14.4"
+  val fs2Version = "3.6.1"
+}
+
 lazy val horseshow =
   (project in file("."))
     .enablePlugins(ScalaJSPlugin)
@@ -17,6 +22,8 @@ lazy val horseshow =
       organization := "io.github.jisantuc",
       libraryDependencies ++= Seq(
         "io.indigoengine" %%% "tyrian-io" % "0.6.1",
+        "co.fs2" %%% "fs2-core" % Versions.fs2Version,
+        "io.circe" %%% "circe-fs2" % Versions.circeVersion,
         "org.scalameta"   %%% "munit"     % "0.7.29" % Test
       ),
       testFrameworks += new TestFramework("munit.Framework"),
