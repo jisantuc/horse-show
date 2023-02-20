@@ -29,8 +29,5 @@ jobs:
           path: ~/.npm
           key: build-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
 
-      - name: Install NPM dependencies
-        run: npm install
-
       - name: Run tests
         run: ./scripts/test
