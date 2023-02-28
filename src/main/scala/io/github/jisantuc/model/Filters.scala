@@ -6,7 +6,8 @@ final case class Filters(
     round: Option[Int]
 ) {
   def filterRows(rows: List[ResultLine]): List[ResultLine] = {
-    val gameFilter  = game.fold(Filters.always)((g: Game) => _.game == g)
+    val gameFilter: Filters.ResultPredicate =
+      game.fold(Filters.always)(g => _.game == g)
     val roundFilter = round.fold(Filters.always)((r: Int) => _.round == r)
     val competitorNameFilter =
       competitorNameStartsWith.fold(Filters.always)((n: String) =>

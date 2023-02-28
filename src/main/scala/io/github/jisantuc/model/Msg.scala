@@ -4,4 +4,6 @@ sealed abstract class Msg
 
 object Msg:
   case class DataReceived(rows: List[ResultLine]) extends Msg
-  case object ToggleGameFilter                    extends Msg
+  case class PickGame(game: Game)                 extends Msg
+  case object ClearGameFilter                     extends Msg
+  case object ToggleFilterDisplay                 extends Msg

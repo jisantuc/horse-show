@@ -1,7 +1,12 @@
 package io.github.jisantuc
 
 import cats.effect.IO
+import io.github.jisantuc.components.FilterBar
+import io.github.jisantuc.components.GameFilter
+import io.github.jisantuc.components.NameFilter
+import io.github.jisantuc.components.RoundFilter
 import io.github.jisantuc.model.*
+import io.github.jisantuc.render.flex
 import tyrian.Html.*
 import tyrian.*
 
@@ -29,35 +34,57 @@ object horseshow extends TyrianApp[Msg, Model]:
       Game.NineBall,
       Competitor("Anne", 0),
       Competitor("Fedor Gorst", 1)
+    ),
+    ResultLine(
+      2,
+      Game.NineBall,
+      Competitor("James", 0),
+      Competitor("Anne", 1)
     )
   )
 
   def init(flags: Map[String, String]): (Model, Cmd[IO, Msg]) =
-    (Model(Filters(None, None, None), someLines, someLines), Cmd.None)
+    (
+      Model(Display.On, Filters(None, None, None), someLines, someLines),
+      Cmd.None
+    )
 
   def update(model: Model): Msg => (Model, Cmd[IO, Msg]) =
     case Msg.DataReceived(rows) => (model, Cmd.None)
-    case Msg.ToggleGameFilter =>
-      val oldFilters      = model.filters
-      val newGameFilters  = oldFilters.game.fold(Some(Game.NineBall))(_ => None)
-      val newFilters      = oldFilters.copy(game = newGameFilters)
+    case Msg.PickGame(g) =>
+      val newFilters      = model.filters.copy(game = Some(g))
       val newFilteredData = newFilters.filterRows(model.data)
       (
         model.copy(filters = newFilters, filteredData = newFilteredData),
         Cmd.None
       )
+    case Msg.ClearGameFilter =>
+      (
+        model.copy(
+          filters = model.filters.copy(game = None),
+          filteredData = model.data
+        ),
+        Cmd.None
+      )
+    case Msg.ToggleFilterDisplay =>
+      (
+        model.copy(filterBarStatus = model.filterBarStatus.toggle),
+        Cmd.None
+      )
 
   def view(model: Model): Html[Msg] =
-    div(
-      div(
-        input(
-          _type := "checkbox",
-          label := "9 Ball only",
-          onClick(Msg.ToggleGameFilter)
-        ),
-        text("9 Ball only")
-      ),
-      div(model.filteredData.map(render.resultRowToHtml))
+    div(_class := "flex-column")(
+      button(onClick(Msg.ToggleFilterDisplay))("Show filters"),
+      FilterBar(
+        model.filterBarStatus,
+        GameFilter(model.filters.game),
+        NameFilter(),
+        RoundFilter()
+      ).render,
+      table(styles("border-collapse" -> "collapse"))(
+        render.header +:
+          model.filteredData.zipWithIndex.map(render.resultRowToHtml)
+      )
     )
 
   def subscriptions(model: Model): Sub[IO, Msg] =

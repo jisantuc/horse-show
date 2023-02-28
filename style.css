@@ -1,12 +1,37 @@
+.tr-odd {
+}
+
+.tr-even {
+        background-color: #D4C1EC;
+}
+
 .cell {
         padding: 0.5rem;
 }
 
 .result-winner {
-        min-width: 10rem;
         font-weight: bold;
 }
 
 .result-loser {
-        min-width: 10rem;
+}
+
+.result-game {
+        text-align: center;
+        max-width: 1rem;
+}
+
+.result-round {
+        text-align: center;
+        max-width: 1rem;
+}
+
+.flex-column {
+        display: flex;
+        flex-direction: column;
+}
+
+.flex-row {
+        display: flex;
+        flex-direction: row;
 }
