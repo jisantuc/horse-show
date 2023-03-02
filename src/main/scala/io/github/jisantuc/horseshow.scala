@@ -7,6 +7,7 @@ import io.github.jisantuc.components.NameFilter
 import io.github.jisantuc.components.RoundFilter
 import io.github.jisantuc.model.*
 import io.github.jisantuc.render.flex
+import monocle.syntax.all._
 import tyrian.Html.*
 import tyrian.*
 
@@ -51,29 +52,58 @@ object horseshow extends TyrianApp[Msg, Model]:
 
   def update(model: Model): Msg => (Model, Cmd[IO, Msg]) =
     case Msg.DataReceived(rows) => (model, Cmd.None)
-    case Msg.PickGame(g) =>
+    case Msg.FilterMsg.IncrementRound =>
+      val maxRound: Option[Int] = model.filters
+        .filterRowsWithoutRound(model.data)
+        .maxByOption(_.round)
+        .map(_.round)
+      val updated = model
+        .focus(_.filters.round)
+        .modify {
+          case r @ Some(x) if r == maxRound => None
+          case Some(x)                      => Some(x + 1)
+          case None                         => Some(1)
+        }
+      (updated.updateFilters, Cmd.None)
+
+    case Msg.FilterMsg.DecrementRound =>
+      // TODO maxRound should live on state since I think it's relatively expensive to calculate
+      val maxRound: Option[Int] = model.filters
+        .filterRowsWithoutRound(model.data)
+        .maxByOption(_.round)
+        .map(_.round)
+      val updated = model
+        .focus(_.filters.round)
+        .modify {
+          case None    => maxRound
+          case Some(1) => None
+          case Some(x) => Some(x - 1)
+        }
+      (updated.updateFilters, Cmd.None)
+
+    case Msg.FilterMsg.PickGame(g) =>
       val newFilters = model.filters.copy(game = Some(g))
       (
         model.copy(filters = newFilters).updateFilters,
         Cmd.None
       )
-    case Msg.NameIncludes("") =>
+    case Msg.FilterMsg.NameIncludes("") =>
       val newFilters = model.filters.copy(competitorNamePartStartsWith = None)
       (
         model.copy(filters = newFilters).updateFilters,
         Cmd.None
       )
-    case Msg.NameIncludes(nameParts) =>
+    case Msg.FilterMsg.NameIncludes(nameParts) =>
       val newFilters =
         model.filters.copy(competitorNamePartStartsWith = Some(nameParts))
       (model.copy(filters = newFilters).updateFilters, Cmd.None)
-    case Msg.ClearGameFilter =>
+    case Msg.FilterMsg.ClearGameFilter =>
       val newFilters = model.filters.copy(game = None)
       (
         model.copy(filters = newFilters).updateFilters,
         Cmd.None
       )
-    case Msg.ToggleFilterDisplay =>
+    case Msg.FilterMsg.ToggleFilterDisplay =>
       (
         model.copy(filterBarStatus = model.filterBarStatus.toggle),
         Cmd.None
@@ -81,14 +111,17 @@ object horseshow extends TyrianApp[Msg, Model]:
 
   def view(model: Model): Html[Msg] =
     div(_class := "flex-column")(
-      button(onClick(Msg.ToggleFilterDisplay), _class := "header-line")(
+      button(
+        onClick(Msg.FilterMsg.ToggleFilterDisplay),
+        _class := "header-line"
+      )(
         "Show filters"
       ),
       FilterBar(
         model.filterBarStatus,
         GameFilter(model.filters.game),
         NameFilter(model.data),
-        RoundFilter()
+        RoundFilter(model.filters.round)
       ).render,
       table(styles("border-collapse" -> "collapse"))(
         render.header +:

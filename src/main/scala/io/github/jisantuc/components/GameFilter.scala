@@ -13,10 +13,10 @@ final case class GameFilter(
   def render: Html[Msg] = div(styles(flex))(
     label(styles(flex, comfy))(text("Game:")),
     select(styles(flex, comfy))(
-      option(onClick(Msg.ClearGameFilter))(text("all")) +:
+      option(onClick(Msg.FilterMsg.ClearGameFilter))(text("all")) +:
         Game.values.toList.map(g =>
           option(
-            onClick(Msg.PickGame(g))
+            onClick(Msg.FilterMsg.PickGame(g))
           )(text(s"$g"))
         )
     )
