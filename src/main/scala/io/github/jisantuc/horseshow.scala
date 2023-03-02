@@ -81,7 +81,9 @@ object horseshow extends TyrianApp[Msg, Model]:
 
   def view(model: Model): Html[Msg] =
     div(_class := "flex-column")(
-      button(onClick(Msg.ToggleFilterDisplay), _class := "header-line")("Show filters"),
+      button(onClick(Msg.ToggleFilterDisplay), _class := "header-line")(
+        "Show filters"
+      ),
       FilterBar(
         model.filterBarStatus,
         GameFilter(model.filters.game),
