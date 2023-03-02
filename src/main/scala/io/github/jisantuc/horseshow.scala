@@ -52,18 +52,25 @@ object horseshow extends TyrianApp[Msg, Model]:
   def update(model: Model): Msg => (Model, Cmd[IO, Msg]) =
     case Msg.DataReceived(rows) => (model, Cmd.None)
     case Msg.PickGame(g) =>
-      val newFilters      = model.filters.copy(game = Some(g))
-      val newFilteredData = newFilters.filterRows(model.data)
+      val newFilters = model.filters.copy(game = Some(g))
       (
-        model.copy(filters = newFilters, filteredData = newFilteredData),
+        model.copy(filters = newFilters).updateFilters,
         Cmd.None
       )
-    case Msg.ClearGameFilter =>
+    case Msg.NameIncludes("") =>
+      val newFilters = model.filters.copy(competitorNamePartStartsWith = None)
       (
-        model.copy(
-          filters = model.filters.copy(game = None),
-          filteredData = model.data
-        ),
+        model.copy(filters = newFilters).updateFilters,
+        Cmd.None
+      )
+    case Msg.NameIncludes(nameParts) =>
+      val newFilters =
+        model.filters.copy(competitorNamePartStartsWith = Some(nameParts))
+      (model.copy(filters = newFilters).updateFilters, Cmd.None)
+    case Msg.ClearGameFilter =>
+      val newFilters = model.filters.copy(game = None)
+      (
+        model.copy(filters = newFilters).updateFilters,
         Cmd.None
       )
     case Msg.ToggleFilterDisplay =>
@@ -74,11 +81,11 @@ object horseshow extends TyrianApp[Msg, Model]:
 
   def view(model: Model): Html[Msg] =
     div(_class := "flex-column")(
-      button(onClick(Msg.ToggleFilterDisplay))("Show filters"),
+      button(onClick(Msg.ToggleFilterDisplay), _class := "header-line")("Show filters"),
       FilterBar(
         model.filterBarStatus,
         GameFilter(model.filters.game),
-        NameFilter(),
+        NameFilter(model.data),
         RoundFilter()
       ).render,
       table(styles("border-collapse" -> "collapse"))(

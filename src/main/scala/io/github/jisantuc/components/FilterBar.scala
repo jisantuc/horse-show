@@ -15,6 +15,7 @@ case class FilterBar(
   def render: Html[Msg] = display match {
     case Display.On =>
       flexRowOf(
+        Some("header-line"),
         gameFilter.render,
         roundFilter.render,
         nameFilter.render

@@ -5,4 +5,7 @@ case class Model(
     filters: Filters,
     data: List[ResultLine],
     filteredData: List[ResultLine]
-)
+) {
+  def updateFilters: Model =
+    copy(filteredData = filters.filterRows(data))
+}
