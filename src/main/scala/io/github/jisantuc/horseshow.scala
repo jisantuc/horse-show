@@ -77,32 +77,26 @@ object horseshow extends TyrianApp[Msg, Model]:
       (updated.updateFilters, Cmd.None)
 
     case Msg.FilterMsg.PickGame(g) =>
-      val newFilters = model.filters.copy(game = Some(g))
-      (
-        model.copy(filters = newFilters).updateFilters,
-        Cmd.None
-      )
+      val updated = model.focus(_.filters.game).replace(Some(g))
+      (updated.updateFilters, Cmd.None)
+
     case Msg.FilterMsg.NameIncludes("") =>
-      val newFilters = model.filters.copy(competitorNamePartStartsWith = None)
-      (
-        model.copy(filters = newFilters).updateFilters,
-        Cmd.None
-      )
+      val updated =
+        model.focus(_.filters.competitorNamePartStartsWith).replace(None)
+      (updated.updateFilters, Cmd.None)
+
     case Msg.FilterMsg.NameIncludes(nameParts) =>
-      val newFilters =
-        model.filters.copy(competitorNamePartStartsWith = Some(nameParts))
-      (model.copy(filters = newFilters).updateFilters, Cmd.None)
+      val updated = model
+        .focus(_.filters.competitorNamePartStartsWith)
+        .replace(Some(nameParts))
+      (updated.updateFilters, Cmd.None)
+
     case Msg.FilterMsg.ClearGameFilter =>
-      val newFilters = model.filters.copy(game = None)
-      (
-        model.copy(filters = newFilters).updateFilters,
-        Cmd.None
-      )
+      val updated = model.focus(_.filters.game).replace(None)
+      (updated.updateFilters, Cmd.None)
+
     case Msg.FilterMsg.ToggleFilterDisplay =>
-      (
-        model.copy(filterBarStatus = model.filterBarStatus.toggle),
-        Cmd.None
-      )
+      (model.focus(_.filterBarStatus).modify(_.toggle), Cmd.None)
   }
 
   def view(model: Model): Html[Msg] =
