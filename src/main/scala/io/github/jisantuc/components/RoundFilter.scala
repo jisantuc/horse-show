@@ -14,8 +14,7 @@ final case class RoundFilter(currentRound: Option[Int], maxRound: Option[Int]) {
     roundRange.fold(List(noRoundFilter))(range =>
       noRoundFilter +: range.toList.map(roundNum =>
         option(
-          onClick(Msg.FilterMsg.SelectRound(roundNum)),
-          selected(Some(roundNum) == currentRound)
+          onClick(Msg.FilterMsg.SelectRound(roundNum))
         )(s"$roundNum")
       )
     )
