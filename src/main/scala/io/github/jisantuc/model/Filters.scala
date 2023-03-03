@@ -6,6 +6,19 @@ final case class Filters(
     round: Option[Int]
 ) {
 
+  private val gameFilter: Filters.ResultPredicate =
+    game.fold(Filters.always)(g => _.game == g)
+  private val roundFilter = round.fold(Filters.always)((r: Int) => _.round == r)
+  private val competitorNameFilter =
+    competitorNamePartStartsWith.fold(Filters.always)((n: String) =>
+      val lowerPrefixes = n.toLowerCase().split(" ")
+      (result: ResultLine) =>
+        stringPartsMatch(
+          result.winner.name,
+          lowerPrefixes
+        ) || stringPartsMatch(result.loser.name, lowerPrefixes)
+    )
+
   /** Check if any space-separated part of compare matches any prefix in
     * prefixes
     */
@@ -17,23 +30,13 @@ final case class Filters(
     prefixes.foldLeft(true)((acc, s) =>
       acc && lowerCompares.map(_.startsWith(s)).foldLeft(false)(_ || _)
     )
+  }
 
-  }
-  def filterRows(rows: List[ResultLine]): List[ResultLine] = {
-    val gameFilter: Filters.ResultPredicate =
-      game.fold(Filters.always)(g => _.game == g)
-    val roundFilter = round.fold(Filters.always)((r: Int) => _.round == r)
-    val competitorNameFilter =
-      competitorNamePartStartsWith.fold(Filters.always)((n: String) =>
-        val lowerPrefixes = n.toLowerCase().split(" ")
-        (result: ResultLine) =>
-          stringPartsMatch(
-            result.winner.name,
-            lowerPrefixes
-          ) || stringPartsMatch(result.loser.name, lowerPrefixes)
-      )
+  def filterRows(rows: List[ResultLine]): List[ResultLine] =
     rows.filter(r => gameFilter(r) && roundFilter(r) && competitorNameFilter(r))
-  }
+
+  def filterRowsWithoutRound(rows: List[ResultLine]): List[ResultLine] =
+    rows.filter(r => gameFilter(r) && competitorNameFilter(r))
 }
 
 object Filters:
