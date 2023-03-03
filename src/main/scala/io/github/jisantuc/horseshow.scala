@@ -16,7 +16,6 @@ import scala.scalajs.js.annotation.*
 @JSExportTopLevel("TyrianApp")
 object horseshow extends TyrianApp[Msg, Model]:
 
-  // TODO -- add pretend data
   val someLines: List[ResultLine] = List(
     ResultLine(
       1,
@@ -46,39 +45,35 @@ object horseshow extends TyrianApp[Msg, Model]:
 
   def init(flags: Map[String, String]): (Model, Cmd[IO, Msg]) =
     (
-      Model(Display.On, Filters(None, None, None), someLines, someLines),
+      Model(
+        Display.On,
+        Filters(None, None, None),
+        someLines,
+        someLines,
+        someLines.maxByOption(_.round).map(_.round)
+      ),
       Cmd.None
     )
 
-  def update(model: Model): Msg => (Model, Cmd[IO, Msg]) =
+  def update(model: Model): Msg => (Model, Cmd[IO, Msg]) = {
     case Msg.DataReceived(rows) => (model, Cmd.None)
-    case Msg.FilterMsg.IncrementRound =>
-      val maxRound: Option[Int] = model.filters
-        .filterRowsWithoutRound(model.data)
-        .maxByOption(_.round)
-        .map(_.round)
+    case Msg.FilterMsg.SelectRound(0) =>
       val updated = model
         .focus(_.filters.round)
-        .modify {
-          case r @ Some(x) if r == maxRound => None
-          case Some(x)                      => Some(x + 1)
-          case None                         => Some(1)
-        }
+        .replace(None)
       (updated.updateFilters, Cmd.None)
 
-    case Msg.FilterMsg.DecrementRound =>
-      // TODO maxRound should live on state since I think it's relatively expensive to calculate
-      val maxRound: Option[Int] = model.filters
-        .filterRowsWithoutRound(model.data)
-        .maxByOption(_.round)
-        .map(_.round)
+    case Msg.FilterMsg.SelectRound(n)
+        if model.maxFilteredRound.map(_ < n).getOrElse(false) =>
       val updated = model
         .focus(_.filters.round)
-        .modify {
-          case None    => maxRound
-          case Some(1) => None
-          case Some(x) => Some(x - 1)
-        }
+        .replace(None)
+      (updated.updateFilters, Cmd.None)
+
+    case Msg.FilterMsg.SelectRound(n) =>
+      val updated = model
+        .focus(_.filters.round)
+        .replace(Some(n))
       (updated.updateFilters, Cmd.None)
 
     case Msg.FilterMsg.PickGame(g) =>
@@ -108,6 +103,7 @@ object horseshow extends TyrianApp[Msg, Model]:
         model.copy(filterBarStatus = model.filterBarStatus.toggle),
         Cmd.None
       )
+  }
 
   def view(model: Model): Html[Msg] =
     div(_class := "flex-column")(
@@ -121,7 +117,7 @@ object horseshow extends TyrianApp[Msg, Model]:
         model.filterBarStatus,
         GameFilter(model.filters.game),
         NameFilter(model.data),
-        RoundFilter(model.filters.round)
+        RoundFilter(model.filters.round, model.maxFilteredRound)
       ).render,
       table(styles("border-collapse" -> "collapse"))(
         render.header +:
