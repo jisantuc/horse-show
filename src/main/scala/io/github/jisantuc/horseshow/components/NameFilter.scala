@@ -1,9 +1,9 @@
-package io.github.jisantuc.components
+package io.github.jisantuc.horseshow.components
 
-import io.github.jisantuc.model.Msg
-import io.github.jisantuc.model.ResultLine
-import io.github.jisantuc.render.comfy
-import io.github.jisantuc.render.flex
+import io.github.jisantuc.horseshow.model.Msg
+import io.github.jisantuc.horseshow.model.ResultLine
+import io.github.jisantuc.horseshow.render.comfy
+import io.github.jisantuc.horseshow.render.flex
 import tyrian.Html
 import tyrian.Html.*
 

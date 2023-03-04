@@ -1,8 +1,8 @@
-package io.github.jisantuc
+package io.github.jisantuc.horseshow
 
-import io.github.jisantuc.model.Game
-import io.github.jisantuc.model.Msg
-import io.github.jisantuc.model.ResultLine
+import io.github.jisantuc.horseshow.model.Game
+import io.github.jisantuc.horseshow.model.Msg
+import io.github.jisantuc.horseshow.model.ResultLine
 import tyrian.CSS
 import tyrian.Html
 import tyrian.Html.*

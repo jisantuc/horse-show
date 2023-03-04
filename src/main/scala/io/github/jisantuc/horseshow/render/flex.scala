@@ -1,4 +1,4 @@
-package io.github.jisantuc.render
+package io.github.jisantuc.horseshow.render
 
 import tyrian.Html
 import tyrian.Html.*
