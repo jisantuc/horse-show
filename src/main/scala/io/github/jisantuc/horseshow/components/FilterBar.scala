@@ -1,8 +1,8 @@
-package io.github.jisantuc.components
+package io.github.jisantuc.horseshow.components
 
-import io.github.jisantuc.model.Display
-import io.github.jisantuc.model.Msg
-import io.github.jisantuc.render.flex.flexRowOf
+import io.github.jisantuc.horseshow.model.Display
+import io.github.jisantuc.horseshow.model.Msg
+import io.github.jisantuc.horseshow.render.flex.flexRowOf
 import tyrian.Html
 import tyrian.Html.*
 

@@ -1,4 +1,4 @@
-package io.github.jisantuc.model
+package io.github.jisantuc.horseshow.model
 
 sealed abstract class Msg
 

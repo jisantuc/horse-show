@@ -1,12 +1,10 @@
-package io.github.jisantuc
+package io.github.jisantuc.horseshow
 
 import cats.effect.IO
-import io.github.jisantuc.components.FilterBar
-import io.github.jisantuc.components.GameFilter
-import io.github.jisantuc.components.NameFilter
-import io.github.jisantuc.components.RoundFilter
-import io.github.jisantuc.model.*
-import io.github.jisantuc.render.flex
+import io.github.jisantuc.horseshow.components.*
+import io.github.jisantuc.horseshow.http.requestData
+import io.github.jisantuc.horseshow.model.*
+import io.github.jisantuc.horseshow.render.flex
 import monocle.syntax.all._
 import tyrian.Html.*
 import tyrian.*
@@ -16,47 +14,22 @@ import scala.scalajs.js.annotation.*
 @JSExportTopLevel("TyrianApp")
 object horseshow extends TyrianApp[Msg, Model]:
 
-  val someLines: List[ResultLine] = List(
-    ResultLine(
-      1,
-      Game.NineBall,
-      Competitor("James", 0),
-      Competitor("Shane van Boening", 1)
-    ),
-    ResultLine(
-      1,
-      Game.BankPool,
-      Competitor("Michael", 1),
-      Competitor("Naoyuki Oi", 0)
-    ),
-    ResultLine(
-      1,
-      Game.NineBall,
-      Competitor("Anne", 0),
-      Competitor("Fedor Gorst", 1)
-    ),
-    ResultLine(
-      2,
-      Game.NineBall,
-      Competitor("James", 0),
-      Competitor("Anne", 1)
-    )
-  )
-
   def init(flags: Map[String, String]): (Model, Cmd[IO, Msg]) =
     (
       Model(
         Display.On,
         Filters(None, None, None),
-        someLines,
-        someLines,
-        someLines.maxByOption(_.round).map(_.round)
+        List.empty,
+        List.empty,
+        None
       ),
-      Cmd.None
+      Cmd.Run(requestData)(Msg.DataReceived(_))
     )
 
   def update(model: Model): Msg => (Model, Cmd[IO, Msg]) = {
-    case Msg.DataReceived(rows) => (model, Cmd.None)
+    case Msg.DataReceived(rows) => 
+      val updated = model.focus(_.data).replace(rows)
+      (updated.updateFilters, Cmd.None)
     case Msg.FilterMsg.SelectRound(0) =>
       val updated = model
         .focus(_.filters.round)
@@ -120,4 +93,4 @@ object horseshow extends TyrianApp[Msg, Model]:
     )
 
   def subscriptions(model: Model): Sub[IO, Msg] =
-    Sub.None
+      subs.dataSubscription(90)
