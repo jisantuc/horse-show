@@ -27,7 +27,7 @@ object horseshow extends TyrianApp[Msg, Model]:
     )
 
   def update(model: Model): Msg => (Model, Cmd[IO, Msg]) = {
-    case Msg.DataReceived(rows) => 
+    case Msg.DataReceived(rows) =>
       val updated = model.focus(_.data).replace(rows)
       (updated.updateFilters, Cmd.None)
     case Msg.FilterMsg.SelectRound(0) =>
@@ -93,4 +93,4 @@ object horseshow extends TyrianApp[Msg, Model]:
     )
 
   def subscriptions(model: Model): Sub[IO, Msg] =
-      subs.dataSubscription(90)
+    subs.dataSubscription(90)
