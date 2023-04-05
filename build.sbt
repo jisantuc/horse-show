@@ -3,6 +3,8 @@ import scala.language.postfixOps
 
 import sbtwelcome._
 
+Global / semanticdbEnabled := true
+
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
 ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.5.0"
@@ -42,16 +44,20 @@ lazy val etl =
     .enablePlugins(ScalaJSPlugin)
     .settings(
       libraryDependencies ++= Seq(
-        "co.fs2"        %%% "fs2-core"  % Versions.fs2Version,
-        "io.circe"      %%% "circe-fs2" % Versions.circeFs2Version,
-        "org.scalameta" %%% "munit"     % "0.7.29" % Test
+        "co.fs2"        %%% "fs2-core"       % Versions.fs2Version,
+        "com.monovore"  %%% "decline"        % Versions.declineVersion,
+        "com.monovore"  %%% "decline-effect" % Versions.declineVersion,
+        "io.circe"      %%% "circe-fs2"      % Versions.circeFs2Version,
+        "org.scalameta" %%% "munit"          % "0.7.29" % Test,
+        "org.typelevel" %%% "cats-parse" % Versions.catsParseVersion
       ),
       testFrameworks += new TestFramework("munit.Framework"),
       scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) },
-      scalafixOnCompile := true,
-      semanticdbEnabled := true,
-      semanticdbVersion := scalafixSemanticdb.revision,
-      autoAPIMappings   := true
+      scalaJSUseMainModuleInitializer := true,
+      scalafixOnCompile               := false,
+      semanticdbEnabled               := true,
+      semanticdbVersion               := scalafixSemanticdb.revision,
+      autoAPIMappings                 := true
     )
 
 lazy val horseshow =
