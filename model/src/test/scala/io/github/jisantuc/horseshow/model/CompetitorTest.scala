@@ -1,10 +1,9 @@
 package io.github.jisantuc.horseshow.model
 
-import io.github.jisantuc.horseshow.ParseTest
-
 import cats.Show
-import cats.syntax.either._
 import cats.parse.Parser
+import cats.syntax.either._
+import io.github.jisantuc.horseshow.ParseTest
 
 class CompetitorTest extends ParseTest {
   test("parses successfully -- name with two spaces in the middle") {

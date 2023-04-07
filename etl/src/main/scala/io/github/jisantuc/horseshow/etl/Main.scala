@@ -6,13 +6,17 @@ import cats.syntax.either._
 import cats.syntax.show._
 import com.monovore.decline.Opts
 import com.monovore.decline.effect.CommandIOApp
-import fs2.io.{readInputStream, stdout}
-import java.net.URL
 import fs2.Stream
-import fs2.text.{decodeWithCharset, lines, utf8}
+import fs2.io.readInputStream
+import fs2.io.stdout
 import fs2.text
-import java.nio.charset.StandardCharsets
+import fs2.text.decodeWithCharset
+import fs2.text.lines
+import fs2.text.utf8
 import io.github.jisantuc.horseshow.model.ResultLine
+
+import java.net.URL
+import java.nio.charset.StandardCharsets
 
 object Main
     extends CommandIOApp(

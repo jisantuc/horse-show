@@ -1,9 +1,9 @@
 package io.github.jisantuc.horseshow
 
+import cats.Show
 import cats.parse.Parser
 import cats.syntax.either._
 import cats.syntax.show._
-import cats.Show
 
 class ParseTest extends munit.FunSuite {
   def assertParseResultEquals[T](
@@ -12,7 +12,7 @@ class ParseTest extends munit.FunSuite {
   ) = {
     assert(
       actual.isRight,
-      actual.fold(_.show, _ => throw Exception("impossible"))
+      actual.fold(_.show, _ => "impossible")
     )
     assertEquals(actual, Right(expected))
   }

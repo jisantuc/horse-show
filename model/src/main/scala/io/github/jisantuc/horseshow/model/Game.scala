@@ -1,6 +1,7 @@
 package io.github.jisantuc.horseshow.model
 
-import cats.parse.{Parser, Rfc5234}
+import cats.parse.Parser
+import cats.parse.Rfc5234
 import cats.syntax.functor._
 
 enum Game:

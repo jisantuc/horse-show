@@ -1,6 +1,8 @@
 package io.github.jisantuc.horseshow.model
 
-import cats.parse.{Numbers, Parser, Rfc5234}
+import cats.parse.Numbers
+import cats.parse.Parser
+import cats.parse.Rfc5234
 
 final case class Competitor(
     name: String,

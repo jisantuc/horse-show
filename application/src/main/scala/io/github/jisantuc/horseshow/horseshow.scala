@@ -88,7 +88,7 @@ object horseshow extends TyrianApp[Msg, Model]:
       ).render,
       table(styles("border-collapse" -> "collapse"))(
         render.header +:
-          model.filteredData.zipWithIndex.map(render.resultRowToHtml)
+          model.filteredData.zipWithIndex.map(render.resultToHtml)
       )
     )
 

@@ -2,7 +2,7 @@ package io.github.jisantuc.horseshow
 
 import io.github.jisantuc.horseshow.model.Game
 import io.github.jisantuc.horseshow.model.Msg
-import io.github.jisantuc.horseshow.model.ResultLine
+import io.github.jisantuc.horseshow.model.Result
 import tyrian.CSS
 import tyrian.Html
 import tyrian.Html.*
@@ -18,7 +18,7 @@ package object render {
       case Game.BankPool  => "🏦"
     }
 
-  def resultRowToHtml(row: ResultLine, idx: Int): Html[Msg] =
+  def resultToHtml(row: Result, idx: Int): Html[Msg] =
     tr(_class := (if (idx % 2 == 0) "tr-even" else "tr-odd"))(
       td(_class := s"result-round cell ")(
         text(row.round.toString())

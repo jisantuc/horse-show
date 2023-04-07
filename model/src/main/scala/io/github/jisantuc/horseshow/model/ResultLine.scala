@@ -1,7 +1,8 @@
 package io.github.jisantuc.horseshow.model
 
-import cats.parse.{Parser, Rfc5234}
+import cats.parse.Parser
 import cats.parse.Parser0
+import cats.parse.Rfc5234
 
 case class ResultLine(
     round: Int,
