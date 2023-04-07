@@ -30,9 +30,10 @@ descriptionColor := scala.Console.WHITE
 
 val Versions = new {
   val catsParseVersion = "0.3.9"
+  val circeVersion     = "0.14.1"
   val declineVersion   = "2.4.1"
-  val circeFs2Version  = "0.14.1"
   val fs2Version       = "3.6.1"
+  val munitVersion     = "0.7.29"
 }
 
 lazy val root =
@@ -41,35 +42,46 @@ lazy val root =
 
 lazy val etl =
   (project in file("./etl"))
-    .enablePlugins(ScalaJSPlugin)
+    .dependsOn(model.jvm)
     .settings(
       libraryDependencies ++= Seq(
-        "co.fs2"        %%% "fs2-core"       % Versions.fs2Version,
-        "com.monovore"  %%% "decline"        % Versions.declineVersion,
-        "com.monovore"  %%% "decline-effect" % Versions.declineVersion,
-        "io.circe"      %%% "circe-fs2"      % Versions.circeFs2Version,
-        "org.scalameta" %%% "munit"          % "0.7.29" % Test,
-        "org.typelevel" %%% "cats-parse" % Versions.catsParseVersion
+        "co.fs2"        %% "fs2-core"       % Versions.fs2Version,
+        "co.fs2"        %% "fs2-io"         % Versions.fs2Version,
+        "com.monovore"  %% "decline"        % Versions.declineVersion,
+        "com.monovore"  %% "decline-effect" % Versions.declineVersion,
+        "org.scalameta" %% "munit"          % "0.7.29" % Test
       ),
       testFrameworks += new TestFramework("munit.Framework"),
-      scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) },
-      scalaJSUseMainModuleInitializer := true,
-      scalafixOnCompile               := false,
-      semanticdbEnabled               := true,
-      semanticdbVersion               := scalafixSemanticdb.revision,
-      autoAPIMappings                 := true
+      scalafixOnCompile := false,
+      semanticdbEnabled := true,
+      semanticdbVersion := scalafixSemanticdb.revision,
+      autoAPIMappings   := true
+    )
+
+lazy val model =
+  crossProject(JVMPlatform, JSPlatform)
+    .crossType(CrossType.Pure)
+    .settings(
+      name := "model",
+      libraryDependencies ++= Seq(
+        "org.typelevel" %%% "cats-parse" % Versions.catsParseVersion,
+        "io.circe"      %%% "circe-core" % Versions.circeVersion,
+        "org.scalameta" %%% "munit"      % Versions.munitVersion % Test
+      ),
+      testFrameworks += new TestFramework("munit.Framework"),
     )
 
 lazy val horseshow =
   (project in file("./application"))
     .enablePlugins(ScalaJSPlugin)
+    .dependsOn(model.js)
     .settings( // Normal settings
       name := "horseshow",
       libraryDependencies ++= Seq(
         "dev.optics"      %%% "monocle-core" % "3.2.0",
         "io.indigoengine" %%% "tyrian-io"    % "0.6.1",
         "co.fs2"          %%% "fs2-core"     % Versions.fs2Version,
-        "io.circe"        %%% "circe-fs2"    % Versions.circeFs2Version,
+        "io.circe"        %%% "circe-fs2"    % Versions.circeVersion,
         "org.scalameta"   %%% "munit"        % "0.7.29" % Test
       ),
       testFrameworks += new TestFramework("munit.Framework"),
