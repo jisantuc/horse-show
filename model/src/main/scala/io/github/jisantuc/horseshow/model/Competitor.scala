@@ -3,6 +3,7 @@ package io.github.jisantuc.horseshow.model
 import cats.parse.Numbers
 import cats.parse.Parser
 import cats.parse.Rfc5234
+import cats.syntax.applicative._
 
 final case class Competitor(
     name: String,
@@ -31,11 +32,18 @@ object Competitor {
   private val nameParser = for {
     firstName <- firstNameParser <* space
     suffix1   <- (jrParser <* space).backtrack.?
-    lastName  <- lastNameParser
-    suffix2   <- (space *> jrParser).backtrack.?
-  } yield (suffix1 orElse suffix2).fold(s"$firstName $lastName")(suffix =>
-    s"$firstName $lastName $suffix"
-  )
+    middleInitial <- suffix1.fold((Rfc5234.char <* space).backtrack.?)(_ =>
+      Parser.pure(Option.empty[Char])
+    )
+    lastName <- lastNameParser
+    suffix2  <- (space *> jrParser).backtrack.?
+  } yield {
+    val suffix = suffix1 orElse suffix2
+    val plain  = s"$firstName $lastName"
+    suffix.fold(
+      middleInitial.fold(plain)(initial => s"$firstName $initial $lastName")
+    )(suffix => s"$firstName $lastName $suffix")
+  }
 
   val parser = for {
     name   <- nameParser
