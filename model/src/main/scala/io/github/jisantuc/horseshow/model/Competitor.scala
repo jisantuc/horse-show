@@ -23,9 +23,11 @@ object Competitor {
     abbreviatedFirstNameParser.backtrack orElse alphaString
 
   private val lastNameParser: Parser[String] = for {
+    prefix     <- Parser.string("De ").as("De ").?.backtrack.with1
     component1 <- alphaString
     component2 <- (Parser.char('-') *> lastNameParser).?
-  } yield component2.fold(component1)(c2 => s"$component1-$c2")
+  } yield s"${prefix
+    .getOrElse("")}${component2.fold(component1)(c2 => s"$component1-$c2")}"
 
   private val srParser = (Parser.string("Sr") ~ Parser.char('.').?).as("Sr.")
 
