@@ -29,14 +29,18 @@ object Competitor {
 
   private val jrParser = (Parser.string("Jr") ~ Parser.char('.').?).as("Jr.")
 
+  private val thirdParser = Parser.string("III").as("III")
+
+  private val suffixParser = jrParser.backtrack orElse thirdParser.backtrack
+
   private val nameParser = for {
     firstName <- firstNameParser <* space
-    suffix1   <- (jrParser <* space).backtrack.?
+    suffix1   <- (suffixParser <* space).backtrack.?
     middleInitial <- suffix1.fold((Rfc5234.char <* space).backtrack.?)(_ =>
       Parser.pure(Option.empty[Char])
     )
     lastName <- lastNameParser
-    suffix2  <- (space *> jrParser).backtrack.?
+    suffix2  <- (space *> suffixParser).backtrack.?
   } yield {
     val suffix = suffix1 orElse suffix2
     val plain  = s"$firstName $lastName"
