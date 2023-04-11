@@ -15,13 +15,13 @@ object Competitor {
   private val alphaString = Rfc5234.alpha.rep.string
   private val space       = Rfc5234.sp.rep
 
-  private val abbreviatedFirstNameParser = (for {
+  private val abbreviatedNameParser = (for {
     initial <- Rfc5234.alpha
     _       <- Parser.char('.')
   } yield s"$initial.").rep.map(_.toList.mkString)
 
   private val firstNameParser =
-    abbreviatedFirstNameParser.backtrack orElse alphaString
+    abbreviatedNameParser.backtrack orElse alphaString
 
   private val lastNameParser: Parser[String] = for {
     prefix     <- Parser.string("De ").as("De ").?.backtrack.with1
@@ -43,7 +43,7 @@ object Competitor {
   private[model] val firstMiddleLastParser = for {
     firstName <- firstNameParser <* space
     middle <-
-      alphaString between (!suffixParser, space) // middle names are like first names often?
+      firstNameParser between (!suffixParser, space) // middle names are like first names often?
     lastName <- !suffixParser *> lastNameParser
   } yield s"$firstName $middle $lastName"
 
