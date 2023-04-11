@@ -38,7 +38,7 @@ val Versions = new {
 
 lazy val root =
   (project in file("."))
-    .aggregate(etl, horseshow)
+    .aggregate(etl, horseshow, modelJS, modelJVM)
 
 lazy val etl =
   (project in file("./etl"))
@@ -71,10 +71,13 @@ lazy val model =
       testFrameworks += new TestFramework("munit.Framework"),
     )
 
+val modelJS = model.js
+val modelJVM = model.jvm
+
 lazy val horseshow =
   (project in file("./application"))
     .enablePlugins(ScalaJSPlugin)
-    .dependsOn(model.js)
+    .dependsOn(modelJS)
     .settings( // Normal settings
       name := "horseshow",
       libraryDependencies ++= Seq(
