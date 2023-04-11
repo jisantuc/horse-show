@@ -11,7 +11,7 @@ final case class Competitor(
 )
 
 object Competitor {
-  private val alphaString = Rfc5234.alpha.rep.map(_.toList.mkString)
+  private val alphaString = Rfc5234.alpha.rep.string
   private val space       = Rfc5234.sp.rep
 
   private val abbreviatedFirstNameParser = (for {
@@ -38,7 +38,15 @@ object Competitor {
   private val suffixParser =
     jrParser.backtrack orElse srParser.backtrack orElse numberSuffixParser.backtrack
 
-  private val nameParser = for {
+  // different from the complex in that it ignores suffixes that might be mixed throughout
+  private[model] val firstMiddleLastParser = for {
+    firstName <- firstNameParser <* space
+    _         <- !suffixParser
+    middle   <- alphaString <* space // middle names are like first names often?
+    lastName <- lastNameParser
+  } yield s"$firstName $middle $lastName"
+
+  private[model] val complexNameParser = for {
     firstName <- firstNameParser <* space
     suffix1   <- (suffixParser <* space).backtrack.?
     middleInitial <- suffix1.fold((Rfc5234.char <* space).backtrack.?)(_ =>
@@ -53,6 +61,9 @@ object Competitor {
       middleInitial.fold(plain)(initial => s"$firstName $initial $lastName")
     )(suffix => s"$firstName $lastName $suffix")
   }
+
+  private[model] val nameParser: Parser[String] =
+    firstMiddleLastParser.backtrack | complexNameParser
 
   val parser = for {
     name   <- nameParser
