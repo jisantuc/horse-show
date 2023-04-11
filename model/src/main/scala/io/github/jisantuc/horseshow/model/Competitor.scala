@@ -41,9 +41,9 @@ object Competitor {
   // different from the complex in that it ignores suffixes that might be mixed throughout
   private[model] val firstMiddleLastParser = for {
     firstName <- firstNameParser <* space
-    _         <- !suffixParser
-    middle   <- alphaString <* space // middle names are like first names often?
-    lastName <- lastNameParser
+    middle <-
+      alphaString between (!suffixParser, space) // middle names are like first names often?
+    lastName <- !suffixParser *> lastNameParser
   } yield s"$firstName $middle $lastName"
 
   private[model] val complexNameParser = for {
