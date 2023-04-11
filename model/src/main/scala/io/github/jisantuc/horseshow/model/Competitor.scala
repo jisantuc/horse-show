@@ -7,7 +7,8 @@ import cats.syntax.applicative._
 
 final case class Competitor(
     name: String,
-    losses: Int
+    losses: Int,
+    buyBack: Boolean
 )
 
 object Competitor {
@@ -68,6 +69,8 @@ object Competitor {
   val parser = for {
     name   <- nameParser
     _      <- space <* Parser.char('(')
-    losses <- Numbers.digits.map(_.toInt) <* Parser.char(')')
-  } yield Competitor(name, losses)
+    losses <- Numbers.digits.map(_.toInt)
+    buyBack <- Parser.char('B').as(true).orElse(Parser.pure(false)) <* Parser
+      .char(')')
+  } yield Competitor(name, losses, buyBack)
 }
