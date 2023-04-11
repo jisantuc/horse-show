@@ -33,6 +33,6 @@ class CompetitorTest extends ParseTest {
 
   test("parses successfully -- name with three parts") {
     val parseResult = Competitor.parser.parseAll("A Jr C (1)")
-    assertParseResultEquals(parseResult, Competitor("A C Jr", 1))
+    assertParseResultEquals(parseResult, Competitor("A C Jr.", 1))
   }
 }

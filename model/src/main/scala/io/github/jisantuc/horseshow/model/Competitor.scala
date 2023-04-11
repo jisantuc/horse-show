@@ -26,19 +26,19 @@ object Competitor {
     component2 <- (Parser.char('-') *> lastNameParser).?
   } yield component2.fold(component1)(c2 => s"$component1-$c2")
 
-  private val threePartNameParser = for {
-    firstName <- firstNameParser <* space
-    suffix    <- alphaString <* space
-    lastName  <- lastNameParser
-  } yield s"$firstName $lastName $suffix"
+  private val jrParser = (Parser.string("Jr") ~ Parser.char('.').?).as("Jr.")
 
-  private val twoPartNameParser = for {
+  private val nameParser = for {
     firstName <- firstNameParser <* space
+    suffix1   <- (jrParser <* space).backtrack.?
     lastName  <- lastNameParser
-  } yield s"$firstName $lastName"
+    suffix2   <- (space *> jrParser).backtrack.?
+  } yield (suffix1 orElse suffix2).fold(s"$firstName $lastName")(suffix =>
+    s"$firstName $lastName $suffix"
+  )
 
   val parser = for {
-    name   <- threePartNameParser.backtrack orElse twoPartNameParser
+    name   <- nameParser
     _      <- space <* Parser.char('(')
     losses <- Numbers.digits.map(_.toInt) <* Parser.char(')')
   } yield Competitor(name, losses)
