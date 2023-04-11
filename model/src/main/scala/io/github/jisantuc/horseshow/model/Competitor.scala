@@ -21,20 +21,25 @@ object Competitor {
   private val firstNameParser =
     abbreviatedFirstNameParser.backtrack orElse alphaString
 
+  private val lastNameParser: Parser[String] = for {
+    component1 <- alphaString
+    component2 <- (Parser.char('-') *> lastNameParser).?
+  } yield component2.fold(component1)(c2 => s"$component1-$c2")
+
   private val threePartNameParser = for {
     firstName <- firstNameParser <* space
     suffix    <- alphaString <* space
-    lastName  <- alphaString
+    lastName  <- lastNameParser
   } yield s"$firstName $lastName $suffix"
 
   private val twoPartNameParser = for {
     firstName <- firstNameParser <* space
-    lastName  <- alphaString
+    lastName  <- lastNameParser
   } yield s"$firstName $lastName"
 
   val parser = for {
     name   <- threePartNameParser.backtrack orElse twoPartNameParser
-    _      <- Rfc5234.sp <* Parser.char('(')
+    _      <- space <* Parser.char('(')
     losses <- Numbers.digits.map(_.toInt) <* Parser.char(')')
   } yield Competitor(name, losses)
 }

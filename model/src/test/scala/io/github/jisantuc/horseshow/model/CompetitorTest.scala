@@ -16,6 +16,16 @@ class CompetitorTest extends ParseTest {
     assertParseResultEquals(parseResult, Competitor("A.A. Milne", 3))
   }
 
+  test("parses successfully -- last name with hyphens") {
+    val parseResult = Competitor.parser.parseAll("A B-B (4)")
+    assertParseResultEquals(parseResult, Competitor("A B-B", 4))
+  }
+
+  test("parses successfully -- last name with two hyphens") {
+    val parseResult = Competitor.parser.parseAll("A B-B-B (5)")
+    assertParseResultEquals(parseResult, Competitor("A B-B-B", 5))
+  }
+
   test("parses successfully -- name with two parts and normal spacing") {
     val parseResult = Competitor.parser.parseAll("A B (1)")
     assertParseResultEquals(parseResult, Competitor("A B", 1))
