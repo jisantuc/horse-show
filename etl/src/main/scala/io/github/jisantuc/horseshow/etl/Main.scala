@@ -35,6 +35,7 @@ object Main
     .through(text.decodeWithCharset(StandardCharsets.UTF_8))
     .through(lines)
     .drop(10)
+    .filter(s => !s.isEmpty())
     .flatMap(line =>
       Stream.eval {
         IO.fromEither(
