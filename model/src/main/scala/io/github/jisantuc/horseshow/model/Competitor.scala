@@ -29,9 +29,10 @@ object Competitor {
 
   private val jrParser = (Parser.string("Jr") ~ Parser.char('.').?).as("Jr.")
 
-  private val thirdParser = Parser.string("III").as("III")
+  private val numberSuffixParser = Parser.char('I').as('I').rep.string
 
-  private val suffixParser = jrParser.backtrack orElse thirdParser.backtrack
+  private val suffixParser =
+    jrParser.backtrack orElse numberSuffixParser.backtrack
 
   private val nameParser = for {
     firstName <- firstNameParser <* space

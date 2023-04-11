@@ -41,8 +41,19 @@ class CompetitorTest extends ParseTest {
     assertParseResultEquals(parseResult, Competitor("A B C", 2))
   }
 
+  test("parses successfully -- name with I") {
+    val parseResult = Competitor.parser.parseAll("A Bb I (2)")
+    assertParseResultEquals(parseResult, Competitor("A Bb I", 2))
+  }
+
   test("parses successfully -- name with III") {
     val parseResult = Competitor.parser.parseAll("A Bb III (2)")
     assertParseResultEquals(parseResult, Competitor("A Bb III", 2))
   }
+
+  test("parses successfully -- name with IIIIII") {
+    val parseResult = Competitor.parser.parseAll("A Bb IIIIII (2)")
+    assertParseResultEquals(parseResult, Competitor("A Bb IIIIII", 2))
+  }
+
 }
