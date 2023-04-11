@@ -48,6 +48,7 @@ object Main
     .map(_.toString)
     .through(utf8.encode)
     .through(stdout[IO])
+  // TODO omg last thing and write it to a file for now
   // rewrite to ndjson
   // (gonna need a new module for the model)
   override def main: Opts[IO[ExitCode]] =
