@@ -13,14 +13,22 @@ object Competitor {
   private val alphaString = Rfc5234.alpha.rep.map(_.toList.mkString)
   private val space       = Rfc5234.sp.rep
 
+  private val abbreviatedFirstNameParser = (for {
+    initial <- Rfc5234.alpha
+    _       <- Parser.char('.')
+  } yield s"$initial.").rep.map(_.toList.mkString)
+
+  private val firstNameParser =
+    abbreviatedFirstNameParser.backtrack orElse alphaString
+
   private val threePartNameParser = for {
-    firstName <- alphaString <* space
+    firstName <- firstNameParser <* space
     suffix    <- alphaString <* space
     lastName  <- alphaString
   } yield s"$firstName $lastName $suffix"
 
   private val twoPartNameParser = for {
-    firstName <- alphaString <* space
+    firstName <- firstNameParser <* space
     lastName  <- alphaString
   } yield s"$firstName $lastName"
 
