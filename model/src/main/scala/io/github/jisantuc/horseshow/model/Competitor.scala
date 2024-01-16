@@ -4,6 +4,8 @@ import cats.parse.Numbers
 import cats.parse.Parser
 import cats.parse.Rfc5234
 import cats.syntax.applicative._
+import io.circe.Decoder
+import io.circe.Encoder
 
 final case class Competitor(
     name: String,
@@ -12,7 +14,17 @@ final case class Competitor(
 )
 
 object Competitor {
-  private val alphaString = Rfc5234.alpha.rep.string
+
+  implicit val encoderCompetitor: Encoder[Competitor] =
+    Encoder.forProduct3("name", "losses", "buyBack")(c =>
+      (c.name, c.losses, c.buyBack)
+    )
+  implicit val decoderCompetitor: Decoder[Competitor] =
+    Decoder.forProduct3("name", "losses", "buyBack")(Competitor.apply)
+
+  private val anyNameIshChar =
+    Parser.char('-') orElse Parser.char('.') orElse Parser.char('\'')
+  private val alphaString = (Rfc5234.alpha orElse anyNameIshChar).rep.string
   private val space       = Rfc5234.sp.rep
 
   private val abbreviatedNameParser = (for {

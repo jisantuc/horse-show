@@ -1,7 +1,6 @@
 package io.github.jisantuc.horseshow.etl
 
-import cats.effect.ExitCode
-import cats.effect.IO
+import cats.effect.{ExitCode, IO, Resource}
 import cats.syntax.either._
 import cats.syntax.show._
 import com.monovore.decline.Opts
@@ -13,10 +12,13 @@ import fs2.text
 import fs2.text.decodeWithCharset
 import fs2.text.lines
 import fs2.text.utf8
+import io.circe.syntax._
 import io.github.jisantuc.horseshow.model.ResultLine
 
 import java.net.URL
 import java.nio.charset.StandardCharsets
+import fs2.io.file.Files
+import fs2.io.file.Path
 
 object Main
     extends CommandIOApp(
@@ -27,7 +29,7 @@ object Main
   val resultsCsvUrl = new URL(
     "http://results.derbycityclassic.com/LiveMatchesandResults/DCCCompletedMatches.csv"
   )
-  val csvLinesStream = readInputStream[IO](
+  def csvLinesStream(outPath: String) = readInputStream[IO](
     IO.delay(resultsCsvUrl.openConnection.getInputStream),
     4096,
     closeAfterUse = true
@@ -45,14 +47,13 @@ object Main
         )
       }
     )
-    .map(_.toString)
+    .map(_.asJson.noSpaces)
+    .intersperse("\n")
     .through(utf8.encode)
-    .through(stdout[IO])
-  // TODO omg last thing and write it to a file for now
-  // rewrite to ndjson
-  // (gonna need a new module for the model)
+    .through(Files[IO].writeAll(Path(outPath)))
+
   override def main: Opts[IO[ExitCode]] =
-    Opts.argument[String](metavar = "lol").map { _ =>
-      csvLinesStream.compile.drain.as(ExitCode.Success)
+    Opts.argument[String](metavar = "output-file-name").map { outFile =>
+      csvLinesStream(outFile).compile.drain.as(ExitCode.Success)
     }
 }

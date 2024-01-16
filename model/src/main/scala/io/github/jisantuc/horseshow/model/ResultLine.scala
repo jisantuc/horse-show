@@ -3,6 +3,8 @@ package io.github.jisantuc.horseshow.model
 import cats.parse.Parser
 import cats.parse.Parser0
 import cats.parse.Rfc5234
+import io.circe.Decoder
+import io.circe.Encoder
 
 case class ResultLine(
     round: Int,
@@ -20,4 +22,18 @@ object ResultLine {
     competitor1 <- Competitor.parser <* comma
     competitor2 <- Competitor.parser
   } yield ResultLine(round, game, competitor1, competitor2)
+
+  implicit val encoderResultLine: Encoder[ResultLine] = Encoder.forProduct4(
+    "round",
+    "game",
+    "competitor1",
+    "competitor2"
+  )(result =>
+    (result.round, result.game, result.competitor1, result.competitor2)
+  )
+
+  implicit val decoderResultLine: Decoder[ResultLine] =
+    Decoder.forProduct4("round", "game", "competitor1", "competitor2")(
+      ResultLine.apply
+    )
 }

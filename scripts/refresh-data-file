@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+source ./scripts/lib.sh
+
+inDevShell yarn
+inDevShell sbt 'etl/run -- dcc-results.ndjson'
+

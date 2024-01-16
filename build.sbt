@@ -33,23 +33,25 @@ val Versions = new {
   val circeVersion     = "0.14.1"
   val declineVersion   = "2.4.1"
   val fs2Version       = "3.6.1"
+  val fs2AwsVersion    = "6.1.1"
   val munitVersion     = "0.7.29"
 }
 
 lazy val root =
   (project in file("."))
     .aggregate(etl, horseshow, modelJS, modelJVM)
+    .dependsOn(etl)
 
 lazy val etl =
   (project in file("./etl"))
     .dependsOn(model.jvm)
     .settings(
       libraryDependencies ++= Seq(
-        "co.fs2"        %% "fs2-core"       % Versions.fs2Version,
-        "co.fs2"        %% "fs2-io"         % Versions.fs2Version,
-        "com.monovore"  %% "decline"        % Versions.declineVersion,
-        "com.monovore"  %% "decline-effect" % Versions.declineVersion,
-        "org.scalameta" %% "munit"          % "0.7.29" % Test
+        "co.fs2"           %% "fs2-core"        % Versions.fs2Version,
+        "co.fs2"           %% "fs2-io"          % Versions.fs2Version,
+        "com.monovore"     %% "decline"         % Versions.declineVersion,
+        "com.monovore"     %% "decline-effect"  % Versions.declineVersion,
+        "org.scalameta"    %% "munit"           % "0.7.29" % Test
       ),
       testFrameworks += new TestFramework("munit.Framework"),
       scalafixOnCompile := false,
@@ -68,10 +70,10 @@ lazy val model =
         "io.circe"      %%% "circe-core" % Versions.circeVersion,
         "org.scalameta" %%% "munit"      % Versions.munitVersion % Test
       ),
-      testFrameworks += new TestFramework("munit.Framework"),
+      testFrameworks += new TestFramework("munit.Framework")
     )
 
-val modelJS = model.js
+val modelJS  = model.js
 val modelJVM = model.jvm
 
 lazy val horseshow =
