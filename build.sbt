@@ -3,28 +3,90 @@ import scala.language.postfixOps
 
 import sbtwelcome._
 
+Global / semanticdbEnabled := true
+
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
 ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.5.0"
 
+ThisBuild / organization := "io.github.jisantuc"
+ThisBuild / scalaVersion := "3.3.1"
+ThisBuild / version      := "0.0.1"
+
+usefulTasks := Seq(
+  UsefulTask("", "fastOptJS", "Rebuild the JS (use during development)"),
+  UsefulTask(
+    "",
+    "fullOptJS",
+    "Rebuild the JS and optimise (use in production)"
+  ),
+  UsefulTask("", "code", "Launch VSCode")
+)
+logo             := "🐎 Show (v" + version.value + ")"
+logoColor        := scala.Console.MAGENTA
+aliasColor       := scala.Console.BLUE
+commandColor     := scala.Console.CYAN
+descriptionColor := scala.Console.WHITE
+
 val Versions = new {
-  val circeFs2Version = "0.14.1"
-  val fs2Version      = "3.6.1"
+  val catsParseVersion = "0.3.9"
+  val circeVersion     = "0.14.1"
+  val declineVersion   = "2.4.1"
+  val fs2Version       = "3.6.1"
+  val fs2AwsVersion    = "6.1.1"
+  val munitVersion     = "0.7.29"
 }
 
-lazy val horseshow =
+lazy val root =
   (project in file("."))
+    .aggregate(etl, horseshow, modelJS, modelJVM)
+    .dependsOn(etl)
+
+lazy val etl =
+  (project in file("./etl"))
+    .dependsOn(model.jvm)
+    .settings(
+      libraryDependencies ++= Seq(
+        "co.fs2"           %% "fs2-core"        % Versions.fs2Version,
+        "co.fs2"           %% "fs2-io"          % Versions.fs2Version,
+        "com.monovore"     %% "decline"         % Versions.declineVersion,
+        "com.monovore"     %% "decline-effect"  % Versions.declineVersion,
+        "org.scalameta"    %% "munit"           % "0.7.29" % Test
+      ),
+      testFrameworks += new TestFramework("munit.Framework"),
+      scalafixOnCompile := false,
+      semanticdbEnabled := true,
+      semanticdbVersion := scalafixSemanticdb.revision,
+      autoAPIMappings   := true
+    )
+
+lazy val model =
+  crossProject(JVMPlatform, JSPlatform)
+    .crossType(CrossType.Pure)
+    .settings(
+      name := "model",
+      libraryDependencies ++= Seq(
+        "org.typelevel" %%% "cats-parse" % Versions.catsParseVersion,
+        "io.circe"      %%% "circe-core" % Versions.circeVersion,
+        "org.scalameta" %%% "munit"      % Versions.munitVersion % Test
+      ),
+      testFrameworks += new TestFramework("munit.Framework")
+    )
+
+val modelJS  = model.js
+val modelJVM = model.jvm
+
+lazy val horseshow =
+  (project in file("./application"))
     .enablePlugins(ScalaJSPlugin)
+    .dependsOn(modelJS)
     .settings( // Normal settings
-      name         := "horseshow",
-      version      := "0.0.1",
-      scalaVersion := "3.2.1",
-      organization := "io.github.jisantuc",
+      name := "horseshow",
       libraryDependencies ++= Seq(
         "dev.optics"      %%% "monocle-core" % "3.2.0",
         "io.indigoengine" %%% "tyrian-io"    % "0.6.1",
         "co.fs2"          %%% "fs2-core"     % Versions.fs2Version,
-        "io.circe"        %%% "circe-fs2"    % Versions.circeFs2Version,
+        "io.circe"        %%% "circe-fs2"    % Versions.circeVersion,
         "org.scalameta"   %%% "munit"        % "0.7.29" % Test
       ),
       testFrameworks += new TestFramework("munit.Framework"),
@@ -34,32 +96,5 @@ lazy val horseshow =
       semanticdbVersion := scalafixSemanticdb.revision,
       autoAPIMappings   := true
     )
-    .settings( // Launch VSCode when you type `code` in the sbt terminal
-      code := {
-        val command = Seq("code", ".")
-        val run = sys.props("os.name").toLowerCase match {
-          case x if x contains "windows" => Seq("cmd", "/C") ++ command
-          case _                         => command
-        }
-        run.!
-      }
-    )
     .settings( // Welcome message
-      logo := "🐎 Show (v" + version.value + ")",
-      usefulTasks := Seq(
-        UsefulTask("", "fastOptJS", "Rebuild the JS (use during development)"),
-        UsefulTask(
-          "",
-          "fullOptJS",
-          "Rebuild the JS and optimise (use in production)"
-        ),
-        UsefulTask("", "code", "Launch VSCode")
-      ),
-      logoColor        := scala.Console.MAGENTA,
-      aliasColor       := scala.Console.BLUE,
-      commandColor     := scala.Console.CYAN,
-      descriptionColor := scala.Console.WHITE
     )
-
-lazy val code =
-  taskKey[Unit]("Launch VSCode in the current directory")
