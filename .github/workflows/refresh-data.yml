@@ -17,5 +17,11 @@ jobs:
       - name: Refresh data Files
         run: ./scripts/refresh-data-file
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::123456789100:role/my-github-actions-role
+          aws-region: us-east-2
+
       - name: Upload data file to s3
         run: aws s3 cp dcc-results.ndjson s3://horse-show-data-us-west-2/dcc-results.ndjson
