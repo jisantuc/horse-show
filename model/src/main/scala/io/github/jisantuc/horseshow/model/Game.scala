@@ -3,8 +3,8 @@ package io.github.jisantuc.horseshow.model
 import cats.parse.Parser
 import cats.parse.Rfc5234
 import cats.syntax.functor._
-import io.circe.Encoder
 import io.circe.Decoder
+import io.circe.Encoder
 
 enum Game:
   case NineBall, BankPool, OnePocket

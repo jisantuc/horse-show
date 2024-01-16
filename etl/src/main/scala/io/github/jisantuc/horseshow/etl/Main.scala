@@ -1,11 +1,15 @@
 package io.github.jisantuc.horseshow.etl
 
-import cats.effect.{ExitCode, IO, Resource}
+import cats.effect.ExitCode
+import cats.effect.IO
+import cats.effect.Resource
 import cats.syntax.either._
 import cats.syntax.show._
 import com.monovore.decline.Opts
 import com.monovore.decline.effect.CommandIOApp
 import fs2.Stream
+import fs2.io.file.Files
+import fs2.io.file.Path
 import fs2.io.readInputStream
 import fs2.io.stdout
 import fs2.text
@@ -17,8 +21,6 @@ import io.github.jisantuc.horseshow.model.ResultLine
 
 import java.net.URL
 import java.nio.charset.StandardCharsets
-import fs2.io.file.Files
-import fs2.io.file.Path
 
 object Main
     extends CommandIOApp(
