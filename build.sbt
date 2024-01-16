@@ -10,7 +10,7 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.5.0"
 
 ThisBuild / organization := "io.github.jisantuc"
-ThisBuild / scalaVersion := "3.2.1"
+ThisBuild / scalaVersion := "3.3.1"
 ThisBuild / version      := "0.0.1"
 
 usefulTasks := Seq(
