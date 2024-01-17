@@ -32,7 +32,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::253412657346:role/GitHubActionsOIDSRole
-          aws-region: us-east-2
+          aws-region: us-west-2
 
       - name: Refresh data Files
         run: ./scripts/refresh-data-file
