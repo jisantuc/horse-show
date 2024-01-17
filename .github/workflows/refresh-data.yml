@@ -3,6 +3,9 @@ name: Data refresh
 on:
   schedule:
     - cron: '*/5 * * * *'
+  push:
+    branches:
+      - jisantuc-patch-1
 
 jobs:
   refresh_results:
