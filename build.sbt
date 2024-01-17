@@ -85,13 +85,14 @@ lazy val horseshow =
     .settings( // Normal settings
       name := "horseshow",
       libraryDependencies ++= Seq(
-        "dev.optics"      %%% "monocle-core"        % "3.2.0",
-        "io.indigoengine" %%% "tyrian-io"           % "0.6.1",
-        "co.fs2"          %%% "fs2-core"            % Versions.fs2Version,
-        "co.fs2"          %%% "fs2-io"              % Versions.fs2Version,
-        "com.comcast"     %%% "ip4s-core"           % Versions.ip4sVersion,
-        "io.circe"        %%% "circe-parser"           % Versions.circeVersion,
-        "org.scalameta"   %%% "munit"               % "0.7.29" % Test
+        "dev.optics"      %%% "monocle-core" % "3.2.0",
+        "io.indigoengine" %%% "tyrian-io"    % "0.6.1",
+        "co.fs2"          %%% "fs2-core"     % Versions.fs2Version,
+        "co.fs2"          %%% "fs2-io"       % Versions.fs2Version,
+        "com.comcast"     %%% "ip4s-core"    % Versions.ip4sVersion,
+        "io.circe"        %%% "circe-fs2"    % Versions.circeVersion,
+        "io.circe"        %%% "circe-parser" % Versions.circeVersion,
+        "org.scalameta"   %%% "munit"        % "0.7.29" % Test
       ),
       testFrameworks += new TestFramework("munit.Framework"),
       scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) },
