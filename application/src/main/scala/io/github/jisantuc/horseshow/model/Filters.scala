@@ -12,11 +12,11 @@ final case class Filters(
   private val competitorNameFilter =
     competitorNamePartStartsWith.fold(Filters.always)((n: String) =>
       val lowerPrefixes = n.toLowerCase().split(" ")
-      (result: Result) =>
+      (result: ResultLine) =>
         stringPartsMatch(
-          result.winner.name,
+          result.competitor1.name,
           lowerPrefixes
-        ) || stringPartsMatch(result.loser.name, lowerPrefixes)
+        ) || stringPartsMatch(result.competitor2.name, lowerPrefixes)
     )
 
   /** Check if any space-separated part of compare matches any prefix in
@@ -32,13 +32,13 @@ final case class Filters(
     )
   }
 
-  def filterRows(rows: List[Result]): List[Result] =
+  def filterRows(rows: List[ResultLine]): List[ResultLine] =
     rows.filter(r => gameFilter(r) && roundFilter(r) && competitorNameFilter(r))
 
-  def filterRowsWithoutRound(rows: List[Result]): List[Result] =
+  def filterRowsWithoutRound(rows: List[ResultLine]): List[ResultLine] =
     rows.filter(r => gameFilter(r) && competitorNameFilter(r))
 }
 
 object Filters:
-  type ResultPredicate = Result => Boolean
+  type ResultPredicate = ResultLine => Boolean
   val always: ResultPredicate = _ => true

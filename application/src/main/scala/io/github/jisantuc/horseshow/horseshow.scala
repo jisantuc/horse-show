@@ -3,6 +3,7 @@ package io.github.jisantuc.horseshow
 import cats.effect.IO
 import io.github.jisantuc.horseshow.components.*
 import io.github.jisantuc.horseshow.http.requestData
+import io.github.jisantuc.horseshow.http.requestDataCmd
 import io.github.jisantuc.horseshow.model.*
 import io.github.jisantuc.horseshow.render.flex
 import monocle.syntax.all._
@@ -23,11 +24,15 @@ object horseshow extends TyrianApp[Msg, Model]:
         List.empty,
         None
       ),
-      Cmd.Run(requestData)(Msg.DataReceived(_))
+      requestDataCmd
     )
 
   def update(model: Model): Msg => (Model, Cmd[IO, Msg]) = {
-    case Msg.DataReceived(rows) =>
+    case Msg.RefreshData =>
+      (model, requestDataCmd)
+    case Msg.RefreshDataFailed =>
+      (model, Cmd.None)
+    case Msg.RefreshDataSucceeded(rows) =>
       val updated = model.focus(_.data).replace(rows)
       (updated.updateFilters, Cmd.None)
     case Msg.FilterMsg.SelectRound(0) =>
@@ -93,4 +98,4 @@ object horseshow extends TyrianApp[Msg, Model]:
     )
 
   def subscriptions(model: Model): Sub[IO, Msg] =
-    subs.dataSubscription(90)
+    subs.dataSubscription2(90)

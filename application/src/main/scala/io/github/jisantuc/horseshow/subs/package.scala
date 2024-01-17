@@ -9,12 +9,7 @@ import scala.concurrent.duration.*
 
 package object subs {
 
-  def dataSubscription(seconds: Int) = Sub.make[IO, Msg](
-    "tourney-results",
-    fs2.Stream
-      .awakeEvery[IO](seconds.seconds)
-      .flatMap(_ => fs2.Stream.eval(requestData))
-      .map(Msg.DataReceived(_))
-  )
+  def dataSubscription2(seconds: Int): Sub[IO, Msg] =
+    Sub.every[IO](seconds.seconds, "refresh-data").map(_ => Msg.RefreshData)
 
 }
