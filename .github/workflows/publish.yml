@@ -1,12 +1,13 @@
-name: CI
+name: publish
 
 on:
   push:
-    branches: [main]
-  pull_request:
+    branches:
+      - main
+      - feat/js/publish-gh-pages
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,5 +30,11 @@ jobs:
           path: ~/.npm
           key: build-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
 
-      - name: Run tests
-        run: ./scripts/test
+      - run: ./scripts/build
+        name: Build production assets
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4.5.0
+        with:
+          branch: gh-pages
+          folder: dist
