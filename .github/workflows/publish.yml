@@ -7,7 +7,7 @@ on:
       - feat/js/publish-gh-pages
 
 jobs:
-  release:
+  publish:
     runs-on: ubuntu-latest
 
     steps:
