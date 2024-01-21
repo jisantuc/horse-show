@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feat/js/publish-gh-pages
 
 jobs:
   publish:
