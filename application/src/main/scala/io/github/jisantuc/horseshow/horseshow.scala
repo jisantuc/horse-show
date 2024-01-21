@@ -2,7 +2,6 @@ package io.github.jisantuc.horseshow
 
 import cats.effect.IO
 import io.github.jisantuc.horseshow.components.*
-import io.github.jisantuc.horseshow.http.requestData
 import io.github.jisantuc.horseshow.http.requestDataCmd
 import io.github.jisantuc.horseshow.model.*
 import io.github.jisantuc.horseshow.render.flex
@@ -98,4 +97,4 @@ object horseshow extends TyrianApp[Msg, Model]:
     )
 
   def subscriptions(model: Model): Sub[IO, Msg] =
-    subs.dataSubscription2(90)
+    subs.dataSubscription(90)

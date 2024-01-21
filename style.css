@@ -9,6 +9,10 @@
         padding: 1rem;
 }
 
+.winner {
+        font-weight: bold;
+}
+
 .result-game {
         text-align: center;
         max-width: 1rem;
