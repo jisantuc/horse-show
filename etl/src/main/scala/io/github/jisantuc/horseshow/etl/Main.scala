@@ -17,7 +17,7 @@ import fs2.text.decodeWithCharset
 import fs2.text.lines
 import fs2.text.utf8
 import io.circe.syntax._
-import io.github.jisantuc.horseshow.model.ResultLine
+import io.github.jisantuc.horseshow.model.Result
 
 import java.net.URL
 import java.nio.charset.StandardCharsets
@@ -43,7 +43,7 @@ object Main
     .flatMap(line =>
       Stream.eval {
         IO.fromEither(
-          ResultLine.parser
+          Result.parser
             .parseAll(line)
             .leftMap(err => new Exception(s"Line: ${line};\nErr:\n${err.show}"))
         )

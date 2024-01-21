@@ -42,7 +42,9 @@ object Competitor {
   } yield s"${prefix
     .getOrElse("")}${component2.fold(component1)(c2 => s"$component1-$c2")}"
 
-  private val srParser = (Parser.string("Sr") ~ Parser.char('.').?).as("Sr.")
+  private val srParser =
+    ((Parser.string("Sr") ~ Parser.char('.').?) | Parser.string("Senior"))
+      .as("Sr.")
 
   private val jrParser = (Parser.string("Jr") ~ Parser.char('.').?).as("Jr.")
 
@@ -56,10 +58,11 @@ object Competitor {
     firstName <- firstNameParser <* space
     middle <-
       firstNameParser between (!suffixParser, space) // middle names are like first names often?
-    lastName <- !suffixParser *> lastNameParser
+    lastName <-
+      !suffixParser *> lastNameParser <* (space *> !Rfc5234.alpha).?.backtrack
   } yield s"$firstName $middle $lastName"
 
-  private[model] val complexNameParser = for {
+  val complexNameParser = for {
     firstName <- firstNameParser <* space
     suffix1   <- (suffixParser <* space).backtrack.?
     middleInitial <- suffix1.fold((Rfc5234.char <* space).backtrack.?)(_ =>
@@ -76,11 +79,12 @@ object Competitor {
   }
 
   private[model] val nameParser: Parser[String] =
-    firstMiddleLastParser.backtrack | complexNameParser
+    firstMiddleLastParser.backtrack | complexNameParser.backtrack
 
   val parser = for {
-    name   <- nameParser
-    _      <- space <* Parser.char('(')
+    name <- nameParser
+    // the space might already have been consumed by the name parser
+    _      <- space.? <* Parser.char('(')
     losses <- Numbers.digits.map(_.toInt)
     buyBack <- Parser.char('B').as(true).orElse(Parser.pure(false)) <* Parser
       .char(')')
