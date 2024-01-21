@@ -3,8 +3,8 @@ package io.github.jisantuc.horseshow.model
 case class Model(
     filterBarStatus: Display,
     filters: Filters,
-    data: List[ResultLine],
-    filteredData: List[ResultLine],
+    data: List[Result],
+    filteredData: List[Result],
     maxFilteredRound: Option[Int]
 ) {
   def updateFilters: Model = {

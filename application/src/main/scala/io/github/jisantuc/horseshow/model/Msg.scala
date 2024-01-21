@@ -10,6 +10,6 @@ object Msg:
     case object ToggleFilterDisplay           extends Msg
     case class SelectRound(round: Int)        extends Msg
 
-  case class RefreshDataSucceeded(rows: List[ResultLine]) extends Msg
-  case object RefreshDataFailed                           extends Msg
-  case object RefreshData                                 extends Msg
+  case class RefreshDataSucceeded(rows: List[Result]) extends Msg
+  case object RefreshDataFailed                       extends Msg
+  case object RefreshData                             extends Msg
