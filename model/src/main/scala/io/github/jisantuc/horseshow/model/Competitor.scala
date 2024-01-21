@@ -59,7 +59,7 @@ object Competitor {
     middle <-
       firstNameParser between (!suffixParser, space) // middle names are like first names often?
     lastName <-
-      !suffixParser *> lastNameParser <* (space *> !Rfc5234.alpha).backtrack
+      !suffixParser *> lastNameParser <* (space *> !Rfc5234.alpha).?.backtrack
   } yield s"$firstName $middle $lastName"
 
   val complexNameParser = for {
